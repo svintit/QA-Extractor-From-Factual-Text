@@ -1,0 +1,21 @@
+#!/bin/bash
+
+STRING=""
+OUTPUT=$(sudo docker ps | grep extractor)
+
+LOGFILE=/tmp/composejob.log
+
+echo "OUTPUT: $OUTPUT" >> $LOGFILE
+
+if [ X"$STRING" =  X"$OUTPUT" ]
+then
+	echo "working dir: $(pwd)" >> $LOGFILE
+	docker-compose up || exit 1
+	echo "finished the job." >> $LOGFILE
+else
+	echo "ELSE BLOCK" >> $LOGFILE
+fi
+
+echo "wrapping up" >> $LOGFILE
+
+exit 0

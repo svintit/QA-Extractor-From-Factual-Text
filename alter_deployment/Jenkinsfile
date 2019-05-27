@@ -1,0 +1,5 @@
+@Library("github.com/team-telnyx/tlnx-ci-lib")
+tankerAndKubernetes {
+    service = "q_extractor"
+    hostGroup = "dev_v2backend_tankers_2"
+}

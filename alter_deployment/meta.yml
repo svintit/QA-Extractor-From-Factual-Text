@@ -1,0 +1,19 @@
+names:
+    service: q_extractor
+
+project:
+    squad: noc.squad
+    primary_maintainer: traian
+    public_api: false
+    private_api: false
+    dependancies: []
+    service_type: backend
+
+deploy:
+    instances: 1
+    cpu: 100
+    memory: 256
+    version: latest
+    auto-revert: false
+    service:
+        - port: 9331

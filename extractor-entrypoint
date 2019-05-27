@@ -1,0 +1,37 @@
+#!/bin/bash
+
+[[ $- == *i* ]] && stty intr ^z
+
+# Collect static files
+echo " "
+echo "==========================="
+echo "= Collecting static files ="
+echo "==========================="
+python src/manage.py collectstatic --noinput
+
+# Create migration info
+echo " "
+echo "========================="
+echo "= Create migration data ="
+echo "========================="
+python src/manage.py makemigrations
+
+#Apply database migrations
+echo " "
+echo "============================="
+echo "= Apply database migrations ="
+echo "============================="
+python src/manage.py migrate
+
+echo " "
+echo "======================"
+echo "= Running Unit Tests ="
+pytest --ds=extractor_settings.settings -p no:warnings --cov=src/extractor_libs src/tests/unit_tests
+
+# Start server
+echo " "
+echo "==================="
+echo "= Starting server ="
+echo "==================="
+python src/manage.py runserver 0.0.0.0:8000
+

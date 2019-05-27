@@ -1,0 +1,10 @@
+#!/bin/bash
+
+LOGFILE=/tmp/buildjob.log
+
+sudo docker build . | tee $LOGFILE && \
+sudo docker-compose build | tee $LOGFILE
+
+echo "wrapping up" >> $LOGFILE
+
+exit 0

@@ -1,0 +1,57 @@
+version: "3"
+
+services:
+    db:
+        image: postgres:10.1-alpine
+        container_name: db
+        restart: always
+
+    extractor:
+        build: .
+        entrypoint: ./extractor-entrypoint
+        container_name: extractor
+        ports:
+            - "8000:8000"
+        volumes:
+            - .:/extractor
+        depends_on:
+            - db
+
+    selenium-hub:
+        image: selenium/hub:3.141.59
+        container_name: selenium-hub
+        volumes:
+            - .:/extractor
+        ports:
+            - 4444:4444
+        depends_on:
+            - extractor
+
+    chrome:
+        image: selenium/node-chrome:3.141.59
+        container_name: chromenode
+        volumes:
+            - /dev/shm:/dev/shm
+        depends_on:
+            - selenium-hub
+        environment:
+            - HUB_HOST=selenium-hub
+            - HUB_PORT=4444
+        logging:
+            driver: none
+
+    firefox:
+        image: selenium/node-firefox:3.141.59
+        container_name: firefoxnode
+        volumes:
+            - /dev/shm:/dev/shm
+        depends_on:
+            - selenium-hub
+        environment:
+            - HUB_HOST=selenium-hub
+            - HUB_PORT=4444
+        logging:
+            driver: none
+
+volumes:
+    postgress_data:

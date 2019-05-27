@@ -1,0 +1,27 @@
+#!/bin/bash
+
+STRING=""
+OUTPUT=$(sudo docker ps | grep selenium-hub)
+
+LOGFILE=/tmp/testcomposejob.log
+
+echo "OUTPUT: $OUTPUT" >> $LOGFILE
+
+if [ X"$STRING" =  X"$OUTPUT" ]
+then
+	echo "working dir: $(pwd)" >> $LOGFILE
+	echo "Testing hub is not running. Please start project by running sudo ./autorun-containers." || exit 1
+	echo "finished the job." >> $LOGFILE
+else
+	echo "ELSE BLOCK" >> $LOGFILE
+        echo " "
+        echo "================================================="
+        echo "= Running Parallel UI Tests on Firefox/Chrome ="
+        echo "================================================="
+        python3 src/tests/functional_tests/parallel_ui_tests.py
+fi
+
+echo "wrapping up" >> $LOGFILE
+
+exit 0
+
