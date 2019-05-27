@@ -1,0 +1,171 @@
+{% load static %}
+{% load custom_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+        <title>Q&A Session</title>
+
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/bootstrap/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/fonts/iconic/css/material-design-iconic-font.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/animate/animate.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/css-hamburgers/hamburgers.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/animsition/css/animsition.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/select2/select2.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/daterangepicker/daterangepicker.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/css/util.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/css/main.css' %}">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
+        <!-- Favicon and touch icons -->
+        <link rel="shortcut icon" href="{% static 'auth_handler/ico/favicon.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{% static 'auth_handler/ico/apple-touch-icon-144-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{% static 'auth_handler/ico/apple-touch-icon-114-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{% static 'auth_handler/ico/apple-touch-icon-72-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" href="{% static 'auth_handler/ico/apple-touch-icon-57-precomposed.png' %}">
+    </head>
+
+    <body>
+        <form method="POST" id="userforms">
+            {% csrf_token %}
+            {% if messages %}
+                {% for message in messages %}
+                    {% if message.tags == "error" %}
+                        <div class="alert alert-danger custom-alerts-user animated bounceOutDown">
+                    {% else %}
+                        <div class="alert alert-{{message.tags}} custom-alerts-user animated bounceOutDown">
+                    {% endif %}
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <div id="alert_placeholder"></div>
+
+            <div class="logo" style="position: absolute; z-index: 1000; margin-left: 20px; margin-top: 15px;">
+                {% if user.is_authenticated %}
+                    <a href="/"><img src="{% static 'extractor/img/logo.png' %}"></a>
+                    <div class="sessionurl animated flash">
+                        <i class="fas fa-angle-up"></i> <br>
+                        Copy the URL above to share this session
+                    </div>
+                {% else %}
+                    <a href="."><img src="{% static 'extractor/img/logo.png' %}"></a>
+                {% endif %}
+            </div>
+
+            <!-- The Modal -->
+            <div id="myUserSessionModal" class="modal wow animated toggler">
+                <!-- Modal content -->
+                <div class="modal-content animated bounceInDown">
+                    <div class="back">
+                        {% for post in session_vals %}
+                            <h3 style="margin-top: 20px; margin-bottom: 8px; font-weight: bold;">Please Answer Questions Below..</h3>
+                            <div class="line-separator" style="margin: 15px 15px;"></div>
+                            <div class="wow fadeInLeft">
+                                <div class="title" style="border: none; padding-bottom: 20px; border-radius: 15px;">
+                                    <div style="width: 90%; max-width: 1100px; display: inline-block;">
+                                        <h2><u>{{ post.list_title }}</u></h2>
+                                        <div style="display: block; text-align: center; font-family: Poppins-Regular;">{{ post.inputted_text }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="qoutput" id="qoutput">
+                                <div class="line-separator" style="margin-top: 15px;"></div>
+                                <div class="mati" style="float: left; width:58%; border-right: 1px dashed"><u>Questions</u></div>
+                                <div class="mati" style="float: right; margin-right: 15%;"><u>Answer</u></div>
+                                <br>
+                                <div class="line-separator"></div>
+                                <input name="og_input" value="{{ post.inputted_text }}" type="hidden">
+                                <input name="sessionid" value="{{ post.sessionid }}" type="hidden">
+                                <input name="creationuser" value="{{ post.user }}" type="hidden">
+                                <input name="qa_list" value="{{ post.qa_list }}" type="hidden">
+                                {% for list in post.qa_list|toList %}
+                                    {% for q in list %}
+                                        {% if forloop.last %}
+                                        {% else %}
+                                            <div class="qa wow animated fadeIn">
+                                            <!-- QUESTION -->
+                                                <div class="qblock">
+                                                    <input name="questionforanswer" value="{{ q }}" type="hidden">
+                                                    <strong>Q{{ post.qa_list|toList|justQs|index:q }}.</strong>
+                                                    <br>
+                                                    <p>{{ q }}</p>
+                                                </div>
+                                                <!-- ANSWER -->
+                                                <div class="ablock">
+                                                    <textarea class="answerinput" name="answerforquestion" type="text" placeholder="Answer.."></textarea>
+                                                </div>
+                                                <div class="clear"></div>
+                                            </div>
+                                            <div class="line-separator"></div>
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if forloop.last %}
+                                        <div style="margin-bottom: 0; background-color: #F5F5F5; border-radius: 15px; width: 700px; display: inline-block" class="wow animated fadeIn">
+                                            <div class="divider-1 wow animated fadeInLeft"><span></span></div>
+                                            <button form="userforms" type="submit" name="usersubmit" id="usersubmit" title="Submit answers" class="btn btn-primary btn-link-1">Submit Answers!</button>
+                                            <p></p>
+                                            <div class="divider-1 wow animated fadeInLeft"><span></span></div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            {% if completed == 'completed' %}
+                <div class="limiter">
+                    <div class="container-login100" style="background-image: url({% static 'auth_handler/images/1@2x.jpg' %}); position: absolute; z-index: 0">
+                        <div class="usersessiontitle animated fadeIn">
+                            You completed this session, great job!
+                        </div>
+                    </div>
+                </div>
+            {% elif session_vals.all %}
+                <div class="limiter">
+                    <div class="container-login100" style="background-image: url({% static 'auth_handler/images/1@2x.jpg' %}); position: absolute; z-index: 0">
+                        <div class="usersessiontitle animated fadeIn">
+                            Join Session:
+                        </div>
+                        <div class="sessiondetails animated fadeIn">
+                            <br>
+                            <form method="POST">
+                            <div class="wrap-input100 validate-input" data-validate = "Enter Full Name">
+                                <input class="input100" name="username" id="usersname" placeholder="Full Name" autocomplete="off">
+                                <span style="text-align: left;" class="focus-input100" data-placeholder="&#xf207;"></span>
+                            </div>
+                            <div class="container-login100-form-btn" style="margin-top: 30px;">
+                                <button type="button" class="login100-form-btn" id="userSessionBtn" disabled style="margin-top: 10px;">
+                                    Start Session
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="limiter">
+                    <div class="container-login100" style="background-image: url({% static 'auth_handler/images/1@2x.jpg' %}); position: absolute; z-index: 0">
+                        <div class="usersessiontitle animated fadeIn">
+                            This is not an active session
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </form>
+
+        <script src="{% static 'auth_handler/vendor/jquery/jquery-3.2.1.min.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/animsition/js/animsition.min.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/bootstrap/js/popper.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/select2/select2.min.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/countdowntime/countdowntime.js' %}"></script>
+        <script src="{% static 'auth_handler/js/main.js' %}"></script>
+    </body>
+</html>

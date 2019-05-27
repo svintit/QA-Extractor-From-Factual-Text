@@ -1,0 +1,107 @@
+{% load static %}
+
+<!-- LOGIN -->
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+        <title>Login</title>
+
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/bootstrap/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/fonts/font-awesome-4.7.0/css/font-awesome.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/fonts/iconic/css/material-design-iconic-font.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/animate/animate.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/css-hamburgers/hamburgers.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/animsition/css/animsition.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/select2/select2.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/vendor/daterangepicker/daterangepicker.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/css/util.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static 'auth_handler/css/main.css' %}">
+
+        <!-- Favicon and touch icons -->
+        <link rel="shortcut icon" href="{% static 'auth_handler/ico/favicon.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{% static 'auth_handler/ico/apple-touch-icon-144-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{% static 'auth_handler/ico/apple-touch-icon-114-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{% static 'auth_handler/ico/apple-touch-icon-72-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" href="{% static 'auth_handler/ico/apple-touch-icon-57-precomposed.png' %}">
+    </head>
+    <body>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger custom-alerts animated bounceOutUp">
+                    <strong>{{ message }}</strong>
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div class="limiter">
+            <div class="container-login100" style="background-image: url({% static 'auth_handler/images/1@2x.jpg' %});">
+                <div class="wrap-login100 animated zoomIn">
+                    <form method="POST" class="login100-form validate-form">
+                        {% csrf_token %}
+
+                        <span class="login100-form-logo">
+                            <i class="zmdi zmdi-lock-outline"></i>
+                        </span>
+
+                        <span class="login100-form-title p-b-34 p-t-27 animated flash">
+                            Login
+                        </span>
+
+                        <div class="wrap-input100 validate-input" data-validate = "Enter email">
+                            <input class="input100" type="text" name="email" id="email" placeholder="Email">
+                            <span style="text-align:left;" class="focus-input100" data-placeholder="&#xf207;"></span>
+                        </div>
+
+                        <div class="wrap-input100 validate-input" data-validate="Enter password">
+                            <input class="input100" type="password" name="password" id="password" placeholder="Password">
+                            <span style="text-align:left;" class="focus-input100" data-placeholder="&#xf191;"></span>
+                        </div>
+
+                        <div class="container-login100-form-btn" style="margin-top: 30px;">
+                            <button class="login100-form-btn" name="submitlogin" id="submitlogin" style="margin-top: 10px;" type="submit">
+                                Login
+                            </button>
+
+                        </div>
+
+                        <div class="text-center p-t-35">
+                            <a class="txt1" href="#">
+                                Forgot Password?
+                            </a>
+                        </div>
+
+                        <div class="text-center p-t-20">
+                            <a class="txt1" href="/register/">
+                                <hr>
+                                <strong>Not registered? Sign Up!</strong>
+                                <hr>
+                            </a>
+                        </div>
+                        <div class="logo text-center animated pulse">
+                            <a style="color: white;" href="/">Powered by
+                            <img src="{% static '/auth_handler/ico/logo.png' %}" href="">
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="dropDownSelect1"></div>
+
+        <script src="{% static 'auth_handler/vendor/jquery/jquery-3.2.1.min.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/animsition/js/animsition.min.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/bootstrap/js/popper.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/select2/select2.min.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/daterangepicker/moment.min.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/daterangepicker/daterangepicker.js' %}"></script>
+        <script src="{% static 'auth_handler/vendor/countdowntime/countdowntime.js' %}"></script>
+        <script src="{% static 'auth_handler/js/main.js' %}"></script>
+
+    </body>
+</html>

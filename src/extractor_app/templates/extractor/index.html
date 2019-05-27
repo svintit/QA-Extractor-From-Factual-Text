@@ -1,0 +1,770 @@
+{% load static %}
+{% load custom_tags %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+        <title>Let's Extract Questions!</title>
+
+        <!-- CSS -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,600">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:300">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.6/css/all.css">
+        <link rel="stylesheet" href="{% static 'extractor/css/animate.css' %}">
+        <link rel="stylesheet" href="{% static 'extractor/css/mystyle.css' %}">
+        <link rel="stylesheet" href="{% static 'extractor/css/media-queries.css' %}">
+
+        <!-- Favicon and touch icons -->
+        <link rel="shortcut icon" href="{% static 'extractor/ico/favicon.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{% static 'extractor/ico/apple-touch-icon-144-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="114x114" href="{% static 'extractor/ico/apple-touch-icon-114-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" sizes="72x72" href="{% static 'extractor/ico/apple-touch-icon-72-precomposed.png' %}">
+        <link rel="apple-touch-icon-precomposed" href="{% static 'extractor/ico/apple-touch-icon-57-precomposed.png' %}">
+    </head>
+    <body>
+
+        <!-- Top menu -->
+        <nav class="navbar navbar-dark fixed-top navbar-expand-md navbar-no-bg toggler" id="{{ toDownload }}">
+            <div class="container">
+                <div class="navbar-brand wow animated infinite pulse" style='animation-duration: 2s;'>
+                    <a href="/"><img src="{% static 'extractor/img/logo.png' %}"></a>
+                </div>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link scroll-link" href="#top-content">Extract</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link scroll-link" href="#services">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link scroll-link" href="#portfolio">Tech Stack</a>
+                        </li>
+                        {% if user.is_authenticated %}
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link scroll-link" href="#about-us">Creator</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link scroll-link" href="#blog">Blog</a>
+                        </li>
+                        {% endif %}
+                        {% if user.is_authenticated %}
+                            <li class="nav-item">
+                                <div id="dd" class="wrapper-dropdown-5" tabindex="1">
+                                    {% if not user.name %}
+                                    <a style="height: 22px;"><i class="far fa-user" style="margin-right: 20px;"></i>Hi, {{ user }}!</a>
+                                    {% else %}
+                                    <a style="height: 22px;"><i class="far fa-user" style="margin-right: 20px;"></i>Hi, {{ user.name }}!</a>
+                                    {% endif %}
+                                    <ul id="drop" class="dropdown">
+                                        <li><a href="/logout/"><i class="fas fa-sign-out-alt dropdown-icon" style="margin-right: 10px;"></i>Log out</a></li>
+                                    </ul>
+                                </div>
+                            </li>
+                        {% else %}
+                            <li class="nav-item animated shake" style="animation-delay: 8s;">
+                                <a class="btn btn-primary btn-link-1 loginbtn" name="loginbtn" id="loginbtn" href="/login/">Sign In</a>
+                            </li>
+                            <li class="nav-item animated shake" style="animation-delay: 9s;">
+                                <a class="btn btn-primary btn-link-1 registerbtn" name="registerbtn" id="registerbtn" href="/register/">Register</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        {% if messages %}
+            {% for message in messages %}
+                {% if message.tags == "error" %}
+                    <div class="alert alert-danger custom-alerts animated bounceInDown bounceOutUp">
+                {% else %}
+                    <div class="alert alert-{{message.tags}} custom-alerts animated bounceInDown bounceOutUp">
+                {% endif %}
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        <div id="alert_placeholder"></div>
+
+        <!-- Top content -->
+        <div class="top-content toggler">
+            <div class="container">
+                <div class="row">
+                    <img src="{% static 'extractor/img/backgrounds/1@2x.jpg' %}" style="position: absolute; margin: 0px; padding: 0px; border: none; width: 100%; height: 700px; max-height: none; max-width: none; z-index: -999999; left: 0px; top: 0px;">
+                    <div class="col-md-8 offset-md-2 text title-back wow animated fadeInRight">
+                        <h1 class="wow animated fadeInLeft">Extract Questions <br> from Factual Text!</h1>
+                        <div class="description wow animated fadeInLeft">
+                            <p>
+                            Input a file or paste a piece of text and click submit <br> to extract questions from the text.
+                            </p>
+                        </div>
+                        <div class="top-big-link wow animated bounce btn-file" style="animation-delay: 1.5s;">
+                            <form method="POST" enctype="multipart/form-data" id="upload_form" name="fileinput">
+                                {% csrf_token %}
+                                <a class="btn btn-primary btn-link-1 scroll-link" id="fileInput" href="#top-content" title="Upload file from computer">Input File</a>
+                                <input
+                                    accept=".txt"
+                                    type="file"
+                                    name="my_uploaded_file"
+                                    style="cursor:pointer;"
+                                    onclick="document.getElementById('fileInput').click();"
+                                />
+                                <input type="hidden" name="fileinput"/>
+                                <script type="text/javascript">
+                                    document.getElementById("upload_form").onchange = function() {
+                                        document.getElementById("upload_form").submit();
+                                    };
+                                </script>
+                            </form>
+                        </div>
+                        {% if user.is_authenticated %}
+                                <div class="top-big-link wow animated bounce btn-file" style="animation-delay: 2s;">
+                                    <a class="btn btn-primary btn-link-1-outline scroll-link" id="mySessionBtn" href="#top-content" title="Create a session for users to join and answer questions through a unique link">My Questions</a>
+                                </div>
+                                <div class="top-big-link wow animated bounce btn-file" style="animation-delay: 2s;">
+                                    <a class="btn btn-primary btn-link-1-outline scroll-link" id="myPrevSessionBtn" href="#top-content" title="View previous and current sessions">My Sessions</a>
+                                </div>
+                        {% endif %}
+                        <div class="top-big-link wow animated bounce btn-file" style="animation-delay: 2.5s">
+                            <a class="btn btn-primary btn-link-1 scroll-link" id="myBtn" href="#top-content" title="Paste copied text">Paste Text</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Modal -->
+        <div id="myModal" class="modal wow animated toggler">
+            <!-- Modal content -->
+            <div class="modal-content animated bounceInDown">
+                <span class="close">&times;</span>
+                <div class="back">
+                    <h3 style="margin-top: 20px; margin-bottom: 8px; font-weight: bold;">Paste text below...</h3>
+                    <form method="POST" name="textinput">
+                        {% csrf_token %}
+                        {{ inputform }}
+                        <button class="btn btn-primary btn-link-1" type="submit" name="textinput">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Session Modal -->
+        <div id="mySessionModal" class="sessionmodal wow toggler">
+            <!-- Session Modal content -->
+            <div class="sessionmodal-content animated bounceInDown">
+                <span class="sessionclose">&times;</span>
+                    <div style="margin: 0 auto; width: 90%;">
+                        <h3 style="font-weight: bold;">Saved Questions and Answers</h3>
+                        <div class="line-separator" style="width: 100%; margin: 10px auto 30px auto;"></div>
+                    </div>
+                    <div id="accordion">
+                        {% if postdata.all %}
+                            {% for post in postdata %}
+                                <div class="card" style="background-color: #FEFDFE; border: hidden;">
+                                    <div class="card-header" id="heading{{ forloop.counter }}" style="background-color: #FEFDFE; border: hidden;">
+                                        <h5 class="mb-0" style="background-color: ##FEFDFE; border: none;">
+                                            <button class="btn btn-link btn-primary btn-link-1" style="width: 90%; margin: -8px auto;" data-toggle="collapse" data-target="#collapse{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse{{ forloop.counter }}">
+                                                {{ post.post }}
+                                                {% if post.list_title == "" %}
+                                                    <div class="sessionlisttitle">No Title</div>
+                                                {% else %}
+                                                    <div class="sessionlisttitle">{{ post.list_title }}</div>
+                                                {% endif %}
+                                                <div class="sessionlistdate">{{ post.created }}</div>
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id="collapse{{ forloop.counter }}" class="collapse" aria-labelledby="heading{{ forloop.counter }}" data-parent="#accordion">
+                                        <div class="card-body">
+                                            <div class="wow fadeInRight">
+                                                <div class="wow fadeInLeft">
+                                                    <div class="title" style="border: none; padding-bottom: 20px; border-radius: 15px;">
+                                                        <div style="width: 90%; max-width: 1100px; display: inline-block;">
+                                                            <h2><u>Inputted Text</u></h2>
+                                                            <div style="display: block; text-align: center;">{{ post.inputted_text }}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="qoutput" id="qoutput">
+                                                    <div class="line-separator" style="margin-top: 25px;"></div>
+                                                    <div class="mati" style="float: left; width:58%; border-right: 1px dashed"><u>Questions</u></div>
+                                                    <div class="mati" style="float: right; margin-right: 15%;"><u>Answer</u></div>
+                                                    <br>
+                                                    <div class="line-separator"></div>
+                                                    <form method="POST" name="sessiondownload{{forloop.counter}}" id="sessiondownload{{forloop.counter}}" class="sessiondownload{{forloop.counter}}" target="_blank">
+                                                        {% csrf_token %}
+                                                        <input name="choices[]" value="{{ post.qa_list }}" type="hidden">
+                                                        <input name="og_input" value="{{ post.inputted_text }}" type="hidden">
+                                                        <input name="qatitle" value="{{ post.list_title }}" type="hidden">
+                                                        {% for list in post.qa_list|toList %}
+                                                            <div class="qa wow animated fadeInRight">
+                                                                {% for q in list %}
+                                                                    {% if forloop.last %}
+                                                                        <!-- ANSWER -->
+                                                                        <div class="ablock">{{ q }}</div>
+                                                                        <div class="clear"></div>
+                                                                    {% else %}
+                                                                        <!-- QUESTION -->
+                                                                        <div class="qblock">
+                                                                            <strong>Q{{ post.qa_list|toList|justQs|index:q }}.</strong>
+                                                                            <br>
+                                                                            <p>{{ q }}</p>
+                                                                        </div>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </div>
+                                                            {% if forloop.last %}
+                                                                <div style="margin-top: 55px; margin-bottom: 0; background-color: #F5F5F5; border-radius: 15px; width: 700px; display: inline-block" class="wow animated fadeIn">
+                                                                    <div class="divider-1-no-border wow animated fadeInLeft"><span></span></div>
+                                                                    <p style="color: gray; font-style: italic;">*Sessions are defaulted to 2 hours from current time*</p>
+                                                                    <button type="submit" name="createsession" id="createsession" target="_blank" title="Create a session for users to join and answer questions" class="btn btn-primary btn-link-1" style="margin-top: 20px">Create Session!</button>
+                                                                    <button type="submit" name="downloadSession" id="sessiondownload" title="Download all questions and answers, they will also be saved" class="btn btn-primary btn-link-1" style="margin-top: 20px">Download Questions!</button>
+                                                                    <div class="divider-1-no-border wow animated fadeInLeft"><span></span></div>
+                                                                </div>
+                                                            {% else %}
+                                                                <div class="line-separator"></div>
+                                                                <div class="clear"></div>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div style="color: #9958B4; margin-top: 50px;">----------------------------------------------------</div>
+                            <h3 style="font-weight: bold"> You have not saved any questions yet! </h3>
+                            <div style="color: #9958B4; margin-bottom: 20px;">----------------------------------------------------</div>
+                            <p> You can save questions from the 'Input File' or 'Paste Text' buttons</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- The Prev Session Modal -->
+        <div id="myPrevSessionModal" class="prevsessionmodal wow animated toggler">
+            <!-- Session Modal content -->
+            <div class="prevsessionmodal-content animated bounceInDown">
+                <span class="prevsessionclose">&times;</span>
+                    <div style="margin: 0 auto; width: 90%;">
+                        <h3 style="font-weight: bold;">Active and Completed Sessions</h3>
+                        <div class="line-separator" style="width: 100%; margin: 10px auto 30px auto;"></div>
+                    </div>
+                    {% if sessiondata.all %}
+                        <div id="accordion">
+                            {% for post in sessiondata %}
+                                <div class="card" style="background-color: #FEFDFE; border: hidden;">
+                                    <div class="card-header" id="heading-{{ forloop.counter }}" style="background-color: #FEFDFE; border: hidden;">
+                                        <h5 class="mb-0" style="background-color: ##FEFDFE; border: none;">
+                                            <button class="btn btn-link btn-primary btn-link-1" style="width: 90%; margin: -8px auto;" data-toggle="collapse" href="#collapse-{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse-{{ forloop.counter }}">
+                                                {{ post.post }}
+                                                {% if post.list_title == "" %}
+                                                    <div class="sessionlisttitle">No Title</div>
+                                                {% else %}
+                                                    <div class="sessionlisttitle">{{ post.list_title }}</div>
+                                                {% endif %}
+                                                <div class="sessionlistdate"><u>{{ post.created|isActiveSession }}</u> - {{ post.created }}</div>
+                                            </button>
+                                        </h5>
+                                    </div>
+                                    <div id="collapse-{{ forloop.counter }}" class="collapse" aria-labelledby="heading-{{ forloop.counter }}" data-parent="#accordion">
+                                        <div class="card-body">
+                                            <div class="wow fadeInRight">
+                                                <p></p>
+                                                <div class="wow fadeInLeft">
+                                                    <div class="title" style="border: none; padding-bottom: 20px; border-radius: 15px; margin-bottom: 20px;">
+                                                        <div style="width: 90%; max-width: 1100px; display: inline-block;">
+                                                            <h2><u>Inputted Text</u></h2>
+                                                            <div style="display: block; text-align: center;">{{ post.inputted_text }}</div>
+                                                        </div>
+                                                        <div class="divider-1 wow animated fadeInLeft"><span></span></div>
+                                                        <a href="/session/{{ post.sessionid }}" target="_blank">Session Link: <strong>extractor.thesvinti.com/session/{{ post.sessionid }} </strong></a>
+                                                        <div class="divider-1 wow animated fadeInLeft"><span></span></div>
+                                                    </div>
+                                                </div>
+                                                {% if post.sessionid|pullSession %}
+                                                    <h3>Users who completed this session:</h3>
+                                                    {% for userpost in post.sessionid|pullSession %}
+                                                        <div id="accordion-1">
+                                                            <div class="card" style="background-color: #FEFDFE; border: hidden;">
+                                                                <div class="card-header" id="heading-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" style="background-color: #FEFDFE; border: hidden;">
+                                                                    <h5 class="mb-0" style="background-color: ##FEFDFE; border: none;">
+                                                                        <button class="collapsed btn btn-link btn-primary btn-link-1-blue" style="width: 75%; margin: -8px auto;" data-toggle="collapse" href="#collapse-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" aria-expanded="false" aria-controls="collapse-{{ forloop.parentloop.counter }}-{{ forloop.counter }}">
+                                                                            {{ post.post }}
+                                                                            <div class="sessionlisttitle">{{ userpost.averagegrade }}% - {{ userpost.username }}</div>
+                                                                            <div class="sessionlistdate">{{ userpost.created }}</div>
+                                                                        </button>
+                                                                    </h5>
+                                                                </div>
+                                                                <div id="collapse-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" class="collapse" aria-labelledby="heading-{{ forloop.parentloop.counter }}-{{ forloop.counter }}" data-parent="#accordion-1">
+                                                                    <div class="card-body">
+                                                                        <div class="wow fadeInRight">
+                                                                            <div class="qoutput" id="qoutput">
+                                                                                <div class="line-separator" style="margin-top: 15px;"></div>
+                                                                                <div class="mati" style="float: left; width:58%; border-right: 1px dashed"><u>Questions</u></div>
+                                                                                <div class="mati" style="float: right; margin-right: 15%;"><u>Answer</u></div>
+                                                                                <br>
+                                                                                <div class="line-separator"></div>
+                                                                                {% if userpost.qalist|toList %}
+                                                                                    {% for qa in userpost.qalist|toList %}
+                                                                                        <div class="qa wow animated fadeIn">
+                                                                                        <!-- QUESTION -->
+                                                                                            <div class="qblock">
+                                                                                                <p></p>
+                                                                                                <strong>Q{{ forloop.counter }}.</strong>
+                                                                                                <p>{{ qa.0 }}</p>
+                                                                                            </div>
+                                                                                            <!-- ANSWER -->
+                                                                                            <div class="ablock">
+                                                                                                {% if qa.1 == "" %}
+                                                                                                    <p style="color: #76458F;"><strong>No answer was provided.</strong></p>
+                                                                                                {% else %}
+                                                                                                    <p>{{ qa.1 }}</p>
+                                                                                                {% endif %}
+                                                                                            </div>
+                                                                                            <div class="clear"></div>
+                                                                                        </div>
+                                                                                        <div class="line-separator"></div>
+                                                                                    {% endfor %}
+                                                                                {% else %}
+                                                                                    <div style="color: #9958B4; margin-top: 50px;">----------------------------------------------------</div>
+                                                                                    <h3 style="font-weight: bold"> All Answers where empty </h3>
+                                                                                    <div style="color: #9958B4; margin-bottom: 20px;">----------------------------------------------------</div>
+                                                                                {% endif %}
+                                                                                <div style="color: #9958B4; margin-top: 50px;">----------------------------------------------------</div>
+                                                                                <h3 style="font-weight: bold"> Estimated Final Grade: {{ userpost.averagegrade }}% </h3>
+                                                                                <div style="color: #9958B4; margin-bottom: 20px;">----------------------------------------------------</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {% endfor %}
+                                                {% else %}
+                                                    <div style="color: #9958B4; margin-top: 50px;">----------------------------------------------------</div>
+                                                    <h3 style="font-weight: bold"> No users have completed this session! </h3>
+                                                    <div style="color: #9958B4; margin-bottom: 20px;">----------------------------------------------------</div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div style="color: #9958B4; margin-top: 50px;">----------------------------------------------------</div>
+                        <h3 style="font-weight: bold"> You have not created any sessions yet! </h3>
+                        <div style="color: #9958B4; margin-bottom: 20px;">----------------------------------------------------</div>
+                        <p> Sessions can be started from the 'My Questions' button</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Extractor Output -->
+        {% for i in range %}
+            <script src="{% static 'extractor/js/jquery-3.2.1.min.js' %}"></script>
+            <script src='{% static 'extractor/js/scroller.js' %}'></script>
+            <div class="output-container toggler" id="output-container">
+                <div class="wow animated fadeInLeft">
+                    <div class="title" style="margin-top: -110px;">
+                        <div style="width: 90%; max-width: 1100px; display: inline-block;">
+                            <h2><u>Inputted Text</u></h2>
+                            <div style="display: block; text-align: center; color: #696969;">{{ ogtext }}</div>
+                            --------------------------------------------------------------------------------------
+                        </div>
+                    </div>
+                </div>
+                <div class="wow animated fadeInRight">
+                    {% if printed == True %}
+                        <div style="color: #9958B4; margin-top: 50px;">----------------------------------------------------</div>
+                        <h3 style="font-weight: bold"> No questions to output </h3>
+                        <div style="color: #9958B4; margin-bottom: 100px;">----------------------------------------------------</div>
+                    {% endif %}
+                    <div class="qoutput" id="qoutput">
+                        {% if printed != True %}
+                            <br>
+                            <div class="mati" style="float: left; width:58%; border-right: 1px dashed"><u>Questions</u></div>
+                            <div class="mati" style="float: right; margin-right: 15%;"><u>Answer</u></div>
+                            <br>
+                            {% if user.is_authenticated %}
+                                <label class="pure-material-checkbox-2" style="float: left;">
+                                    <input type="checkbox" id="checkAll">
+                                    <span>
+                                        Select All
+                                    </span>
+                                </label>
+                            {% endif %}
+                            <div class="line-separator"></div>
+                        {% endif %}
+                        <form method="POST" name="selectedchecks" id="selectedchecks" class="selectedchecks">
+                            {% csrf_token %}
+                            <input name="og_list" value="{{ questions }}" type="hidden">
+                            <input name="og_input" value="{{ ogtext }}" type="hidden">
+                            {% for list in questions %}
+                                <div class="qa wow animated fadeInRight">
+                                    {% for q in list %}
+                                        {% if forloop.last %}
+                                            <!-- ANSWER -->
+                                            <div class="ablock">{{ q }}</div>
+                                            <div class="clear"></div>
+                                        {% else %}
+                                            <!-- QUESTION -->
+                                            <div class="qblock">
+                                                {% if user.is_authenticated %}
+                                                    <label class="pure-material-checkbox">
+                                                        <p></p>
+                                                        <input class="selectedchecks" type="checkbox" name="choices[]" value="{{ q }}">
+                                                        <span>
+                                                            <strong>Q{{ questions|justQs|index:q }}.</strong>
+                                                            <br>
+                                                            <p>{{ q }}</p>
+                                                        </span>
+                                                    </label>
+                                                {% else %}
+                                                    <strong>Q{{ questions|justQs|index:q }}.</strong>
+                                                    <br>
+                                                    <p>{{ q }}</p>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                                {% if forloop.last %}
+                                    <div style="margin-top: 55px; margin-bottom: 80px; background-color: #F5F5F5; border-radius: 15px; width: 700px; display: inline-block" class="wow animated fadeIn">
+                                        {% if user.is_authenticated %}
+                                            <div class="Wrapper">
+                                              <div class="Input">
+                                                <input type="text" id="input" class="Input-text" name="qatitle" placeholder="Add Title...">
+                                              </div>
+                                            </div>
+                                            <button type="submit" form="selectedchecks" name="selectedchecks" id="selectedsubmit downloadonly" title="Save selected questions for session creation" class="btn btn-primary btn-link-1 downloadonly" style="margin-top: 20px">Save Questions!</button>
+                                            <button type="submit" form="selectedchecks" name="toDownload" id="selectedsubmit downloadonly" title="Download all questions and answers, they will also be saved" class="btn btn-primary btn-link-1 downloadonly" style="margin-top: 20px">Download Questions!</button>
+                                        {% else %}
+                                            <div class="divider-1-no-border wow animated fadeInLeft"><span></span></div>
+                                            <a title="Download selected questions for externel use" href="../static/extractor/output/extractor.output" download class="btn btn-primary btn-link-1" style="margin-top: 15px">Download Questions!</a>
+                                            <p></p>
+                                        {% endif %}
+                                        <div class="divider-1-no-border wow animated fadeInLeft"><span></span></div>
+                                    </div>
+                                {% else %}
+                                    <div class="line-separator"></div>
+                                    <div class="clear"></div>
+                                {% endif %}
+                            {% endfor %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <!-- About -->
+        <div class="services-container section-container toggler" style="margin-bottom: -90px;">
+            <div class="container">
+                <div class="row">
+                    <div class="col services section-description wow animated fadeIn" style="margin-top: -30px;">
+                        <h2>About This Project</h2>
+                        <div class="divider-1 wow animated fadeInUp"><span></span></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 services-box wow animated fadeInUp">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="services-box-icon">
+                                    <i class="far fa-question-circle"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h3>Who</h3>
+                                <p>This was created for teachers and students as a means of Comprehension Testing and quizzing.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 services-box wow animated fadeInDown">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="services-box-icon">
+                                    <i class="fas fa-university"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h3>Why</h3>
+                                <p>As a final year project, this was a motivating topic which serves great educational purpose.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 services-box wow animated fadeInUp">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="services-box-icon">
+                                    <i class="fas fa-language"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h3>How</h3>
+                                <p>This project is implemented using Natural Language Processing, Machine Learning and Semantic Analysis to be able to extract questions from the inputted text.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Tech Stack -->
+        <div class="portfolio-container section-container toggler">
+            <div class="container">
+                <div class="row">
+                    <div class="col more-services section-description wow animated fadeIn">
+                        <h2>Tech Stack</h2>
+                        <div class="divider-1 wow animated fadeInUp"><span></span></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 more-services-box wow animated fadeInLeft">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="more-services-box-icon">
+                                    <i class="fab fa-python"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <h3><a href="https://www.python.org/download/releases/3.0/">Python 3</a></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 more-services-boxr wow animated fadeInRight">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <h3><a href="https://www.postgresql.org/">Postgres</a></h3>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="more-services-box-iconr">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 more-services-box wow animated fadeInLeft">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="more-services-box-icon">
+                                    <i class="fab fa-aws"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <h3><a href="https://aws.amazon.com/">Amazon Web Services</a></h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 more-services-boxr wow animated fadeInRight">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <h3><a href="https://www.django-rest-framework.org/">Django Rest Framework</a></h3>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="more-services-box-iconr">
+                                    <i class="fab fa-connectdevelop"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    <div class="row">
+                        <div class="col-md-6 more-services-box wow animated fadeInLeft">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="more-services-box-icon">
+                                        <i class="fab fa-docker"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <h3><a href="https://www.docker.com/">Docker</a></h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 more-services-boxr wow animated fadeInRight">
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <h3><a href="https://www.djangoproject.com/">Django Project</a></h3>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="more-services-box-iconr">
+                                        <i class="fas fa-user-circle"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+        {% else %}
+            <!-- Creator -->
+            <div class="about-us-container section-container section-container-gray-bg toggler">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-12 col-lg-7 about-us-box wow animated fadeInLeft">
+                            <div class="about-us-box-text">
+                                <h3><u>About the Creator</u></h3>
+                                <p class="medium-paragraph">
+                                    I, <strong>Traian Svinti</strong>, am a final year student in <strong>Dublin City University</strong> studing <strong>Computer Applications and Software Engineering</strong>.
+                                    The scope of this project is to create a unique and useful idea which implements <strong>Natural Language Processing</strong> as it's main component.
+                                </p>
+                                <p>
+                                    When beginning this project, I wanted to use tools that I have not previously had experience with to improve my tech stack and knowledge of new systems.
+                                </p>
+                                <p>
+                                    I aim to maintain and improve this extractor as my Python skills improve.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-5 about-us-box wow animated fadeInUp">
+                            <div class="about-us-box-img">
+                                <img src="{% static 'extractor/img/about/me.jpg' %}" alt="about" data-at2x="{% static 'extractor/img/about/me.jpg' %}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Blog -->
+            <div class="blog-container section-container toggler">
+                <div class="container">
+                    <div class="row">
+                        <div class="col blog section-description-blog wow animated fadeIn">
+                            <h2>Project Blog</h2>
+                            <div class="divider-1 wow animated fadeInUp"><span></span></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 blog-box wow animated fadeInLeft">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="blog-box-image">
+                                        <img src="{% static 'extractor/img/blog/1.jpg' %}" alt="" data-at2x="{% static 'extractor/img/blog/1.jpg' %}">
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <h3><a href="#">Post #1</a> <i class="fas fa-angle-right"></i></h3>
+                                    <div class="blog-box-date"><i class="far fa-calendar"></i> 03 October 2018</div>
+                                    <p>
+                                        Searching for inspiration for a project idea. I have interest in the NLP area.<br>
+                                        The idea of a question answering system such as a chat-bot is intriguing but would not be challenging enough as a final year project.<br/>
+                                        *Search continues...*
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 blog-box wow animated fadeInRight">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="blog-box-image">
+                                        <img src="{% static 'extractor/img/blog/2.jpg' %}" alt="" data-at2x="{% static 'extractor/img/blog/2.jpg' %}">
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <h3><a href="#">Post #2</a> <i class="fas fa-angle-right"></i></h3>
+                                    <div class="blog-box-date"><i class="far fa-calendar"></i> 15 October 2018</div>
+                                    <p>
+                                        I have thought of an idea which I believe can be challenging and feasible in the time-frame of the project:<br>
+                                        I would like to implement a question extraction system which takes user factual text input and outputs questions based on the given text. <br>
+                                        Educational use can be a good reason for why this would be implemented.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 blog-box wow animated fadeInLeft">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="blog-box-image">
+                                        <img src="{% static 'extractor/img/blog/3.jpg' %}" alt="" data-at2x="{% static 'extractor/img/blog/3.jpg' %}">
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <h3><a href="#">Post #3</a> <i class="fas fa-angle-right"></i></h3>
+                                    <div class="blog-box-date"><i class="far fa-calendar"></i> 20 October 2018</div>
+                                    <p>
+                                        Beginning research of the topic of NLP I see NLTK as the most commonly used toolkit for this area. <br/>
+                                        Trying to get an idea of the technical stack that is needed to best implement the idea.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 blog-box wow animated fadeInRight">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="blog-box-image">
+                                        <img src="{% static 'extractor/img/blog/4.jpg' %}" alt="" data-at2x="{% static 'extractor/img/blog/4.jpg' %}">
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    <h3><a href="#">Post #4</a> <i class="fas fa-angle-right"></i></h3>
+                                    <div class="blog-box-date"><i class="far fa-calendar"></i> 25 October 2018</div>
+                                    <p>
+                                        I have chose to work with some tools that I would not have previously used. This will help to improve my experience greatly.<br>
+                                        I will be using Python 3 and Django running on a Docker image communicating with other components using Django REST framework which all will be deployed on an AWS EC2 instance. This will cover the infrastructure of the project...
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col section-bottom-button wow animated fadeInUp">
+                            <a class="btn btn-primary btn-link-3" href="#">Visit the blog</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+        <!-- Footer -->
+        <footer>
+            <div class="container toggler">
+                <div class="row">
+                    <div class="footer-right" style="position: center">
+                        <a href="https://www.facebook.com/traian.svinti"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/justtraiansvinti/"><i class="fab fa-instagram"></i></a>
+                        <a href="https://github.com/svintit"><i class="fab fa-github"></i></a>
+                        <a href="mailto:traian.svinti@mail.dcu.ie"><i class="far fa-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col footer-bottom">
+                        <a class="scroll-link" href="#top-content"><i class="fas fa-chevron-up"></i></a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+        <!-- Javascript -->
+        <script src="{% static 'extractor/js/jquery-3.2.1.min.js' %}"></script>
+        <script src="{% static 'extractor/js/jquery-migrate-3.0.0.min.js' %}"></script>
+        <script src="{% static 'extractor/js/scripts.js' %}"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+        <script src="{% static 'extractor/js/jquery.backstretch.min.js' %}"></script>
+        <script src="{% static 'extractor/js/wow.min.js' %}"></script>
+        <script src="{% static 'extractor/js/wow.js' %}"></script>
+        <script src="{% static 'extractor/js/retina-1.1.0.min.js' %}"></script>
+        <script src="{% static 'extractor/js/waypoints.min.js' %}"></script>
+        <script src="{% static 'extractor/js/waypoints.js' %}"></script>
+        <script src="">
+    </body>
+</html>
