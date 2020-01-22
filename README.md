@@ -12,8 +12,7 @@ https://extractor.thesvinti.com/.
 Building and running the project is  not necessary,  nonetheless, is made very simple. Once it the project is cloned from git, enter the root of the project in your terminal of choice. I have made it very simple to build and run the project through scripts to automate the process. Simply run the scripts, autobuild-extractor and afterwards, autorun-extractor as shown below in a single command:
 
 ```
-sudo chmod +x extractor-entrypoint
-sudo chmod +x autobuild-containers && sudo chmod +x autorun-containers
+sudo chmod +x autobuild-containers && sudo chmod +x autorun-containers && sudo chmod +x extractor-entrypoint
 sudo ./autobuild-containers && sudo ./autorun-containers
 ```
 
