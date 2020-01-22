@@ -10,7 +10,7 @@ echo "OUTPUT: $OUTPUT" >> $LOGFILE
 if [ X"$STRING" =  X"$OUTPUT" ]
 then
 	echo "working dir: $(pwd)" >> $LOGFILE
-	docker-compose up || exit 1
+	sudo docker-compose up || exit 1
 	echo "finished the job." >> $LOGFILE
 else
 	echo "ELSE BLOCK" >> $LOGFILE
